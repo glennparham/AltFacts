@@ -23,3 +23,8 @@ Contributors: Glenn Parham, Josh Marks, Parul Singh, Jim Salsman
    `python3 main.py`
 
 ## Process
+
+1. Pass to AltFacts the text you'd like to be verified.
+2. AltFacts uses paperQA to identify relevant citations (if applicable).
+3. We transpose these citations into a pandas dataframe.
+4. We run meta-analysis of these citations to determine (source credibility, bias, etc.)
