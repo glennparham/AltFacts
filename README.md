@@ -4,7 +4,7 @@ This is a project from ScaleAI's Generative AI Hackathon on July 15, 2023.
 
 Contributors: Glenn Parham, Josh Marks, Parul Singh, Jim Salsman
 
-# How To Run
+### How To Run
 
 1. Initialize up your python virutal env:
 
