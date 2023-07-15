@@ -1,5 +1,6 @@
 class AltFacts:
 
+
     def __init__(self, generated_text:str):
         self.generated_text = ""
 

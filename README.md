@@ -17,3 +17,9 @@ Contributors: Glenn Parham, Josh Marks, Parul Singh, Jim Salsman
 3. Install the requirements:
 
    `pip install -r requirements.txt`
+
+4. Run main.py
+
+   `python3 main.py`
+
+## Process
