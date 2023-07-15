@@ -28,3 +28,7 @@ Contributors: Glenn Parham, Josh Marks, Parul Singh, Jim Salsman
 2. AltFacts uses paperQA to identify relevant citations (if applicable).
 3. We transpose these citations into a pandas dataframe.
 4. We run meta-analysis of these citations to determine (source credibility, bias, etc.)
+
+## Sample PDFs
+
+- [Trump's Indictment](https://www.justice.gov/storage/US_v_Trump-Nauta_23-80101.pdf)
