@@ -1,8 +1,16 @@
-## AltFacts
+## AlternativeFacts
+
+![altfacts](./alternativefacts_system_design.jpg)
 
 This is a project from ScaleAI's Generative AI Hackathon on July 15, 2023.
 
 Contributors: Glenn Parham, Josh Marks, Parul Singh, Jim Salsman
+
+1. AlternativeFacts is an open-source python package that verifies the veracity of LLM-generated text against internal documents & the internet.
+2. LLM-generated content needs to be properly sourced & cited. In the context of the Department of Defense & Intelligence Community, this is especially true. Given that many end-users in DoD are non-technical, it’s critical that we provide these supplemental citations.
+3. Currently, AlternativeFacts has the capacity to verify the veracity of claims against both internal (documents, pdfs, etc.) and external (wikipedia, google) data sources.
+4. This leverages the pre-existing open-source project: paper-qa. This project does the heavy lifting of vectorizing documents into embeddings and consequently running queries against them. AlternativeFacts extends this library by (1) decomposing the various claims embedded in LLM-generated text as well as (2) transposing the outputs of paper-qa into an interpretable csv.
+5. Our work can be found publicly here: https://github.com/glennparham/AltFacts
 
 ### How To Run
 

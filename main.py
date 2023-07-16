@@ -63,12 +63,13 @@ class AltFacts:
         import pandas as pd
         
         # Create a Pandas dataframe with the following columns: claim_id (uuid), claim_text, source_text, source_location
-        df = pd.DataFrame(columns=['claim_id','claim_text','source_text','source_location'])
+        df = pd.DataFrame()
         
         # Iterate over each claim, and append a row to the dataframe
         for claim in self.extracted_claims:
             print(claim.claim_id, claim.claim_text)
-            df = df.append({'claim_id':claim.claim_id,'claim_text':claim.claim_text}, ignore_index=False)
+            temp_dic = {'claim_id':claim.claim_id,'claim_text':claim.claim_text}    
+            df = df.append(temp_dic, ignore_index=True)
         df.to_csv('claims.csv', index=False)
         return "Generated"
 
