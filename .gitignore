@@ -1,2 +1,3 @@
 /myenv/**
 /sample_pdfs/**
+.env
