@@ -1,3 +1,4 @@
 /myenv/**
 /sample_pdfs/**
 .env
+.DS_Store

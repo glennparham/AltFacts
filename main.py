@@ -1,8 +1,6 @@
 from typing import List 
 
 import os
-import sys
-# import from .env file
 
 os.environ['OPENAI_API_KEY'] = open('.env').read().strip()
 
@@ -40,20 +38,34 @@ class AltFacts:
         self.source_documents= source_documents
         self.extracted_claims: List[Claim] = []
 
-    # Should return a list of claims (strings). for now filler text. make sure it's strongly typed
+
     def extract_claims(self) -> List[Claim]:
-        # Sample: Trump Indictment
-        # Sample Claim 1 [True]: On September 7, 2016 said "“[O]ne of the first things we must do is to enforce all classification rules and to enforce all laws relating to the handling of classified information."
-        # Sample Claim 2 [False]: In January 2024, former President Trump said 'please don't hate on me.'
-        extracted_claims =  [Claim("On September 7, 2016 said '[O]ne of the first things we must do is to enforce all classification rules and to enforce all laws relating to the handling of classified information."),Claim("In January 2024, former President Trump said 'please don't hate on me.'")]
-        self.extracted_claims = extracted_claims
-        return self.extracted_claims
+        import openai
+        prompt = "Context: " + self.generated_text + "\nWhat are a list of claims that could be fact checked?:"
+        openai.api_key = "***"
+
+        response = openai.Completion.create(
+            engine="text-davinci-003",
+            prompt=prompt,
+            max_tokens=150,
+            n=1,  # Specify the number of claims you want to generate
+            stop=None,
+            temperature=0.8
+        )
+        raw_claims = response['choices'][0]['text'].strip()
+        
+        claims = raw_claims.split("\n")
+        extracated_claims = []
+        for claim in claims:
+            extracated_claims.append(Claim(claim))
+        self.extracted_claims=extracated_claims
+        return extracated_claims
 
     def get_extracted_claims(self) -> List[Claim]:
         return self.extracted_claims
     
     def get_extracted_claims_str(self) -> List[str]:
-        return list(map(lambda x: x.claim_text, self.extracted_claims))
+        return list(map(lambda x: x.claim_text+"\n", self.extracted_claims))
 
     def get_source_documents_filenames(self) -> List[str]:
         # iterate over source_documents and append "/sample_pdfs/" to each and return array
@@ -63,13 +75,19 @@ class AltFacts:
         import pandas as pd
         
         # Create a Pandas dataframe with the following columns: claim_id (uuid), claim_text, source_text, source_location
-        df = pd.DataFrame()
-        
+        # df = pd.DataFrame([])
+        dics = []
         # Iterate over each claim, and append a row to the dataframe
         for claim in self.extracted_claims:
-            print(claim.claim_id, claim.claim_text)
-            temp_dic = {'claim_id':claim.claim_id,'claim_text':claim.claim_text}    
-            df = df.append(temp_dic, ignore_index=True)
+            # print(claim.claim_id, claim.claim_text)
+            
+            if(claim.answer.contexts):
+                for context in claim.answer.contexts:
+                    dics.append( {'claim_id':claim.claim_id,'claim_text':claim.claim_text, "justification": context.context,"source_text":context.text.text,"source_text_location":context.text.name,"credibility_score":context.score})
+            else:
+                dics.append( {'claim_id':claim.claim_id,'claim_text':claim.claim_text, "justification": "No justification found","source_text":"No source text found","source_text_location":"No source text location found","credibility_score":"No credibility score found"})
+        df = pd.DataFrame(dics) 
+            
         df.to_csv('claims.csv', index=False)
         return "Generated"
 
@@ -91,22 +109,27 @@ class AltFacts:
 if __name__ == '__main__':
 
     ### To run this, run `python3 main.py` in the interpreter
-    print("\nInitializing AltFacts...\n")
-    generated_text = "HERE ARE SOME FALSE CLAIMS!!!!"
+    print("\n✅ Initializing AltFacts...\n")
+    generated_text = "On September 7, 2016 said '[O]ne of the first things we must do is to enforce all classification rules and to enforce all laws relating to the handling of classified information. In January 2024, former President Trump said 'please don't hate on me.'"
     source_documents = ["trump_indictment.pdf"]
+  
     altfacts_instance = AltFacts(generated_text=generated_text,source_documents=source_documents)
 
     print("Here are the underlying source documents: ", altfacts_instance.get_source_documents_filenames())
 
     ## Extract the claims from the original generated text.
-    print("\nNow extracting the claims of the generated text...")
+    print("\n⌛ Now extracting the claims of the generated text...\n")
     altfacts_instance.extract_claims()
-    print("Extracted Claims:\n", altfacts_instance.get_extracted_claims_str())
+    print("✅ Extracted Claims:\n", altfacts_instance.get_extracted_claims_str())
 
     ## Iterate over the claims and pass through paperqa
-    print("\n\nNow answering the claims...")
+    print("\n\n⌛ Now verifying the claims...")
     answers = altfacts_instance.answer_claims()
 
-    print("\nNow generating a Pandas dataframe...")
+    print("\n\n✅ Claims have been verified!")
+
+    print("\n⌛Now writing verifications to CSV...\n")
     altfacts_instance.generate_pandas_dataframe()
+
+    print("\n\n✅ CSV has been generated!\n")
 
